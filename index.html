@@ -104,122 +104,162 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const display = document.getElementById("display");
-      const speech = document.getElementById("speech");
-      const hoursInput = document.getElementById("hours");
-      const minutesInput = document.getElementById("minutes");
-      const secondsInput = document.getElementById("seconds");
-      const startBtn = document.getElementById("startBtn");
-      const pauseBtn = document.getElementById("pauseBtn");
-      const resetBtn = document.getElementById("resetBtn");
+  document.addEventListener("DOMContentLoaded", () => {
+    const display = document.getElementById("display");
+    const speech = document.getElementById("speech");
+    const hoursInput = document.getElementById("hours");
+    const minutesInput = document.getElementById("minutes");
+    const secondsInput = document.getElementById("seconds");
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
-      let timerId = null;
-      let totalSeconds = 60;
-      let running = false;
+    let timerId = null;
+    let totalSeconds = 60;
+    let running = false;
+    let speechEnabled = true;
+    let speechUnlocked = false;
+    let speakingNow = false;
 
-      const lines = [
-        "ちゃんとやってる？",
-        "今の10秒、価値あった？",
-        "集中切れてない？",
-        "その手止まってない？",
-        "未来変わってるよ、その10秒で",
-        "ナイス、そのままいけ",
-        "ちょっと疲れてきた？まだいける",
-        "ここでやめたら普通だよ",
-        "続けてる人だけ勝つんよ",
-        "その調子、えらい"
-      ];
+    const lines = [
+      "ちゃんとやってる？",
+      "今の10秒、価値あった？",
+      "集中切れてない？",
+      "その手止まってない？",
+      "未来変わってるよ、その10秒で",
+      "ナイス、そのままいけ",
+      "ちょっと疲れてきた？まだいける",
+      "ここでやめたら普通だよ",
+      "続けてる人だけ勝つんよ",
+      "その調子、えらい"
+    ];
 
-      function formatTime(sec) {
-        const h = String(Math.floor(sec / 3600)).padStart(2, "0");
-        const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-        const s = String(sec % 60).padStart(2, "0");
-        return `${h}:${m}:${s}`;
+    function formatTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+      const s = String(sec % 60).padStart(2, "0");
+      return `${h}:${m}:${s}`;
+    }
+
+    function getInputSeconds() {
+      const h = parseInt(hoursInput.value, 10) || 0;
+      const m = parseInt(minutesInput.value, 10) || 0;
+      const s = parseInt(secondsInput.value, 10) || 0;
+      return h * 3600 + m * 60 + s;
+    }
+
+    function updateDisplay() {
+      display.textContent = formatTime(totalSeconds);
+    }
+
+    function unlockSpeech() {
+      if (!("speechSynthesis" in window) || speechUnlocked) return;
+
+      try {
+        const u = new SpeechSynthesisUtterance("");
+        u.volume = 0;
+        window.speechSynthesis.speak(u);
+        speechUnlocked = true;
+      } catch (e) {
+        console.log("speech unlock failed", e);
       }
+    }
 
-      function getInputSeconds() {
-        const h = parseInt(hoursInput.value, 10) || 0;
-        const m = parseInt(minutesInput.value, 10) || 0;
-        const s = parseInt(secondsInput.value, 10) || 0;
-        return h * 3600 + m * 60 + s;
-      }
+    function say(text) {
+      speech.textContent = text;
 
-      function updateDisplay() {
-        display.textContent = formatTime(totalSeconds);
-      }
+      if (!speechEnabled) return;
+      if (!("speechSynthesis" in window)) return;
+      if (!speechUnlocked) return;
+      if (speakingNow) return;
 
-      function say(text) {
-        speech.textContent = text;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "ja-JP";
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
 
-        if (!("speechSynthesis" in window)) return;
+      utterance.onstart = () => {
+        speakingNow = true;
+      };
 
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "ja-JP";
+      utterance.onend = () => {
+        speakingNow = false;
+      };
+
+      utterance.onerror = () => {
+        speakingNow = false;
+      };
+
+      try {
         window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.log("speech error", e);
       }
+    }
 
-      function stopTimerOnly() {
-        if (timerId) {
-          clearInterval(timerId);
-          timerId = null;
-        }
-        running = false;
+    function stopTimerOnly() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
       }
+      running = false;
+    }
 
-      function startTimerApp() {
-        if (running) return;
+    function startTimerApp() {
+      unlockSpeech();
 
-        if (totalSeconds <= 0) {
-          totalSeconds = getInputSeconds();
-          if (totalSeconds <= 0) totalSeconds = 1;
-        }
+      if (running) return;
 
-        running = true;
-        say("スタート");
-
-        timerId = setInterval(() => {
-          totalSeconds--;
-          updateDisplay();
-
-          if (totalSeconds > 0 && totalSeconds <= 10) {
-            say(`${totalSeconds}秒`);
-          } else if (totalSeconds > 0 && totalSeconds % 10 === 0) {
-            const text = lines[Math.floor(Math.random() * lines.length)];
-            say(text);
-          }
-
-          if (totalSeconds <= 0) {
-            stopTimerOnly();
-            totalSeconds = 0;
-            updateDisplay();
-            say("終了。やったな。");
-          }
-        }, 1000);
-      }
-
-      function pauseTimerApp() {
-        stopTimerOnly();
-        say("停止");
-      }
-
-      function resetTimerApp() {
-        stopTimerOnly();
+      if (totalSeconds <= 0) {
         totalSeconds = getInputSeconds();
         if (totalSeconds <= 0) totalSeconds = 1;
-        updateDisplay();
-        say("リセット");
       }
 
-      startBtn.addEventListener("click", startTimerApp);
-      pauseBtn.addEventListener("click", pauseTimerApp);
-      resetBtn.addEventListener("click", resetTimerApp);
+      running = true;
+      say("スタート");
 
+      timerId = setInterval(() => {
+        totalSeconds--;
+        updateDisplay();
+
+        if (totalSeconds > 0 && totalSeconds <= 10) {
+          say(`${totalSeconds}秒`);
+        } else if (totalSeconds > 0 && totalSeconds % 10 === 0) {
+          const text = lines[Math.floor(Math.random() * lines.length)];
+          say(text);
+        }
+
+        if (totalSeconds <= 0) {
+          stopTimerOnly();
+          totalSeconds = 0;
+          updateDisplay();
+          say("終了。やったな。");
+        }
+      }, 1000);
+    }
+
+    function pauseTimerApp() {
+      stopTimerOnly();
+      say("停止");
+    }
+
+    function resetTimerApp() {
+      stopTimerOnly();
       totalSeconds = getInputSeconds();
       if (totalSeconds <= 0) totalSeconds = 1;
       updateDisplay();
-    });
-  </script>
+      say("リセット");
+    }
+
+    startBtn.addEventListener("click", startTimerApp);
+    pauseBtn.addEventListener("click", pauseTimerApp);
+    resetBtn.addEventListener("click", resetTimerApp);
+
+    totalSeconds = getInputSeconds();
+    if (totalSeconds <= 0) totalSeconds = 1;
+    updateDisplay();
+  });
+</script>
 </body>
 </html>
