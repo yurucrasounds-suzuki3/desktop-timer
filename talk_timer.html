@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10秒ごとに喋るタイマー</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0f1115;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: sans-serif;
+  color: white;
+}
+
+.app {
+  width: 300px;
+  background: #1b2130;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.display {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+input {
+  width: 70px;
+  padding: 8px;
+  margin: 4px;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.start { background: #4caf50; }
+.pause { background: orange; }
+.reset { background: gray; }
+
+.speech {
+  margin-top: 10px;
+  font-size: 13px;
+  background: #111;
+  padding: 10px;
+  border-radius: 10px;
+  min-height: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="display" id="display">00:01:00</div>
+
+  <div>
+    <input id="h" type="number" value="0">時
+    <input id="m" type="number" value="1">分
+    <input id="s" type="number" value="0">秒
+  </div>
+
+  <div>
+    <button class="start" onclick="start()">開始</button>
+    <button class="pause" onclick="pause()">停止</button>
+    <button class="reset" onclick="reset()">リセット</button>
+  </div>
+
+  <div class="speech" id="speech">ここにしゃべります</div>
+</div>
+
+<script>
+let t = null;
+let sec = 60;
+let running = false;
+
+const lines = [
+  "ちゃんとやってる？",
+  "今の10秒、価値あった？",
+  "集中切れてない？",
+  "その手止まってない？",
+  "未来変わってるよその10秒で",
+  "ナイス、そのままいけ",
+  "ちょっと疲れてきた？まだいける",
+  "ここでやめたら普通だよ",
+  "続けてる人だけ勝つんよ",
+  "その調子、えらい"
+];
+
+function format(s){
+  let h = String(Math.floor(s/3600)).padStart(2,"0");
+  let m = String(Math.floor((s%3600)/60)).padStart(2,"0");
+  let ss = String(s%60).padStart(2,"0");
+  return `${h}:${m}:${ss}`;
+}
+
+function speak(text){
+  document.getElementById("speech").innerText = text;
+
+  if (!("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+  let u = new SpeechSynthesisUtterance(text);
+  u.lang = "ja-JP";
+  speechSynthesis.speak(u);
+}
+
+function start(){
+  if(running) return;
+
+  sec = getInput();
+  if(sec <= 0) sec = 1;
+
+  running = true;
+  speak("スタート");
+
+  t = setInterval(()=>{
+    sec--;
+    document.getElementById("display").innerText = format(sec);
+
+    // 🔥 残り10秒カウントダウン
+    if(sec <= 10 && sec > 0){
+      speak(sec + "秒");
+    }
+
+    // 🔥 10秒ごとトーク
+    else if(sec % 10 === 0){
+      speak(lines[Math.floor(Math.random()*lines.length)]);
+    }
+
+    if(sec <= 0){
+      clearInterval(t);
+      running = false;
+      speak("終了。やったな。");
+    }
+
+  },1000);
+}
+
+function pause(){
+  clearInterval(t);
+  running = false;
+  speak("停止");
+}
+
+function reset(){
+  clearInterval(t);
+  running = false;
+  sec = getInput();
+  document.getElementById("display").innerText = format(sec);
+  speak("リセット");
+}
+
+function getInput(){
+  let h = parseInt(document.getElementById("h").value)||0;
+  let m = parseInt(document.getElementById("m").value)||0;
+  let s = parseInt(document.getElementById("s").value)||0;
+  return h*3600 + m*60 + s;
+}
+
+// 初期表示
+sec = getInput();
+document.getElementById("display").innerText = format(sec);
+</script>
+
+</body>
+</html>
