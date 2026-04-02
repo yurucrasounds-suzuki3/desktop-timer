@@ -3,263 +3,498 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>10秒ごとに喋るタイマー</title>
+  <title>こどもカウントダウン</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      background: #0f1115;
+      min-height: 100vh;
+      font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+      background: linear-gradient(180deg, #fff7d6 0%, #ffe9f3 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      font-family: sans-serif;
-      color: white;
-      padding: 12px;
+      padding: 16px;
+      color: #5b4b4b;
     }
 
     .app {
-      width: 300px;
-      background: #1b2130;
+      width: 340px;
+      max-width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
       padding: 20px;
-      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
       text-align: center;
-      box-sizing: border-box;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 4px solid #ffe08a;
     }
 
     .title {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 10px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #ff7aa2;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #8d7f7f;
+      margin-bottom: 14px;
+    }
+
+    .character {
+      font-size: 54px;
+      margin-bottom: 8px;
+    }
+
+    .display-wrap {
+      background: #fff8fb;
+      border: 3px dashed #ffc6da;
+      border-radius: 22px;
+      padding: 14px 10px;
+      margin-bottom: 14px;
     }
 
     .display {
       font-size: 40px;
-      margin-bottom: 15px;
-      font-weight: bold;
-      letter-spacing: 0.05em;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #6d5dfc;
+      font-variant-numeric: tabular-nums;
     }
 
     .inputs {
-      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
-    input {
-      width: 60px;
-      padding: 8px;
-      margin: 4px;
-      border-radius: 8px;
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #8a7b7b;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 46px;
       border: none;
+      border-radius: 14px;
+      background: #f6f7ff;
       text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #5b4b4b;
+      outline: none;
+      border: 2px solid #dfe3ff;
+    }
+
+    .mode-box {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .mode-box label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #8a7b7b;
+    }
+
+    .mode-box select {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: 14px;
+      background: #f6fff6;
+      border: 2px solid #d6f0d6;
+      padding: 0 12px;
       font-size: 16px;
+      color: #5b4b4b;
+      outline: none;
     }
 
     .buttons {
-      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
     button {
-      margin: 5px;
-      padding: 10px 12px;
       border: none;
-      border-radius: 8px;
-      font-weight: bold;
+      border-radius: 16px;
+      padding: 13px 8px;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
+      transition: transform 0.1s ease;
     }
 
-    .start-btn { background: #4caf50; color: white; }
-    .pause-btn { background: orange; color: black; }
-    .reset-btn { background: gray; color: white; }
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .start-btn {
+      background: #7ad97a;
+      color: #fff;
+    }
+
+    .pause-btn {
+      background: #ffd36e;
+      color: #6a5600;
+    }
+
+    .reset-btn {
+      background: #9db4ff;
+      color: #fff;
+    }
 
     .speech {
+      background: #fff8e7;
+      border: 3px solid #ffe08a;
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 74px;
+      font-size: 17px;
+      line-height: 1.6;
+      font-weight: 700;
+      color: #6b5b4b;
+      position: relative;
+    }
+
+    .speech::before {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 28px;
+      width: 20px;
+      height: 20px;
+      background: #fff8e7;
+      border-left: 3px solid #ffe08a;
+      border-top: 3px solid #ffe08a;
+      transform: rotate(45deg);
+    }
+
+    .status {
       margin-top: 10px;
-      font-size: 13px;
-      background: #111;
-      padding: 10px;
-      border-radius: 10px;
-      min-height: 50px;
-      line-height: 1.5;
+      font-size: 12px;
+      color: #9b8d8d;
+      min-height: 18px;
+    }
+
+    .finished {
+      animation: bounce 0.7s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="title">10秒ごとに喋るタイマー</div>
+  <div class="app" id="app">
+    <div class="character" id="character">🐻</div>
+    <div class="title">こどもカウントダウン</div>
+    <div class="subtitle">おしたく・おかたづけ・はみがきに</div>
 
-    <div class="display" id="display">00:01:00</div>
+    <div class="display-wrap">
+      <div class="display" id="display">00:01:00</div>
+    </div>
 
     <div class="inputs">
-      <input id="hours" type="number" min="0" max="23" value="0">時
-      <input id="minutes" type="number" min="0" max="59" value="1">分
-      <input id="seconds" type="number" min="0" max="59" value="0">秒
+      <div class="input-group">
+        <label for="hours">じ</label>
+        <input id="hours" type="number" min="0" max="23" value="0" />
+      </div>
+      <div class="input-group">
+        <label for="minutes">ふん</label>
+        <input id="minutes" type="number" min="0" max="59" value="1" />
+      </div>
+      <div class="input-group">
+        <label for="seconds">びょう</label>
+        <input id="seconds" type="number" min="0" max="59" value="0" />
+      </div>
+    </div>
+
+    <div class="mode-box">
+      <label for="scene">どんなとき？</label>
+      <select id="scene">
+        <option value="cleanup">おかたづけ</option>
+        <option value="sleep">ねるまえのじゅんび</option>
+        <option value="teeth">はみがき</option>
+        <option value="bath">おふろ</option>
+        <option value="goout">おでかけじゅんび</option>
+      </select>
     </div>
 
     <div class="buttons">
-      <button class="start-btn" id="startBtn">開始</button>
-      <button class="pause-btn" id="pauseBtn">停止</button>
-      <button class="reset-btn" id="resetBtn">リセット</button>
+      <button class="start-btn" id="startBtn">スタート</button>
+      <button class="pause-btn" id="pauseBtn">とめる</button>
+      <button class="reset-btn" id="resetBtn">もどす</button>
     </div>
 
-    <div class="speech" id="speech">ここにしゃべります</div>
+    <div class="speech" id="speech">いっしょに がんばろう！</div>
+    <div class="status" id="status">たいきちゅう</div>
   </div>
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const display = document.getElementById("display");
-    const speech = document.getElementById("speech");
-    const hoursInput = document.getElementById("hours");
-    const minutesInput = document.getElementById("minutes");
-    const secondsInput = document.getElementById("seconds");
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const resetBtn = document.getElementById("resetBtn");
+    document.addEventListener("DOMContentLoaded", () => {
+      const app = document.getElementById("app");
+      const display = document.getElementById("display");
+      const speech = document.getElementById("speech");
+      const statusText = document.getElementById("status");
+      const character = document.getElementById("character");
 
-    let timerId = null;
-    let totalSeconds = 60;
-    let running = false;
-    let speechEnabled = true;
-    let speechUnlocked = false;
-    let speakingNow = false;
+      const hoursInput = document.getElementById("hours");
+      const minutesInput = document.getElementById("minutes");
+      const secondsInput = document.getElementById("seconds");
+      const sceneSelect = document.getElementById("scene");
 
-    const lines = [
-      "ちゃんとやってる？",
-      "今の10秒、価値あった？",
-      "集中切れてない？",
-      "その手止まってない？",
-      "未来変わってるよ、その10秒で",
-      "ナイス、そのままいけ",
-      "ちょっと疲れてきた？まだいける",
-      "ここでやめたら普通だよ",
-      "続けてる人だけ勝つんよ",
-      "その調子、えらい"
-    ];
+      const startBtn = document.getElementById("startBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const resetBtn = document.getElementById("resetBtn");
 
-    function formatTime(sec) {
-      const h = String(Math.floor(sec / 3600)).padStart(2, "0");
-      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
-      const s = String(sec % 60).padStart(2, "0");
-      return `${h}:${m}:${s}`;
-    }
+      let timerId = null;
+      let totalSeconds = 60;
+      let running = false;
+      let speechUnlocked = false;
+      let speakingNow = false;
 
-    function getInputSeconds() {
-      const h = parseInt(hoursInput.value, 10) || 0;
-      const m = parseInt(minutesInput.value, 10) || 0;
-      const s = parseInt(secondsInput.value, 10) || 0;
-      return h * 3600 + m * 60 + s;
-    }
-
-    function updateDisplay() {
-      display.textContent = formatTime(totalSeconds);
-    }
-
-    function unlockSpeech() {
-      if (!("speechSynthesis" in window) || speechUnlocked) return;
-
-      try {
-        const u = new SpeechSynthesisUtterance("");
-        u.volume = 0;
-        window.speechSynthesis.speak(u);
-        speechUnlocked = true;
-      } catch (e) {
-        console.log("speech unlock failed", e);
-      }
-    }
-
-    function say(text) {
-      speech.textContent = text;
-
-      if (!speechEnabled) return;
-      if (!("speechSynthesis" in window)) return;
-      if (!speechUnlocked) return;
-      if (speakingNow) return;
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "ja-JP";
-      utterance.rate = 1;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      utterance.onstart = () => {
-        speakingNow = true;
-      };
-
-      utterance.onend = () => {
-        speakingNow = false;
-      };
-
-      utterance.onerror = () => {
-        speakingNow = false;
-      };
-
-      try {
-        window.speechSynthesis.speak(utterance);
-      } catch (e) {
-        console.log("speech error", e);
-      }
-    }
-
-    function stopTimerOnly() {
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-      running = false;
-    }
-
-    function startTimerApp() {
-      unlockSpeech();
-
-      if (running) return;
-
-      if (totalSeconds <= 0) {
-        totalSeconds = getInputSeconds();
-        if (totalSeconds <= 0) totalSeconds = 1;
-      }
-
-      running = true;
-      say("スタート");
-
-      timerId = setInterval(() => {
-        totalSeconds--;
-        updateDisplay();
-
-        if (totalSeconds > 0 && totalSeconds <= 10) {
-          say(`${totalSeconds}秒`);
-        } else if (totalSeconds > 0 && totalSeconds % 10 === 0) {
-          const text = lines[Math.floor(Math.random() * lines.length)];
-          say(text);
+      const sceneData = {
+        cleanup: {
+          icon: "🧸",
+          start: "おかたづけ、スタートだよ。いっしょにやってみよう！",
+          finish: "おしまい！おかたづけできたかな？ すごいね！",
+          lines: [
+            "おもちゃさんを おうちに かえしてあげよう。",
+            "ひとつずつで だいじょうぶだよ。",
+            "あとすこし、がんばれー！",
+            "できてるできてる、いいかんじ！",
+            "まずは ちかくの ひとつから しまってみよう。"
+          ]
+        },
+        sleep: {
+          icon: "🌙",
+          start: "ねるまえの じゅんび、はじめるよ。ゆっくりで だいじょうぶ。",
+          finish: "じゅんび おしまい。おやすみの じかんだね。",
+          lines: [
+            "ねるじゅんび、じょうずに できてるよ。",
+            "おへやを しずかモードに しよう。",
+            "おやすみに むかって すすんでるよ。",
+            "あとちょっとで きらきら ねるじかん。",
+            "ゆっくり、ひとつずつ やってみよう。"
+          ]
+        },
+        teeth: {
+          icon: "🪥",
+          start: "はみがきタイム、スタート！ ぴかぴかに しよう！",
+          finish: "おしまい！おくち ぴかぴかだね！",
+          lines: [
+            "しゃかしゃか、いいかんじ！",
+            "まえの はも、おくの はも、みがいてみよう。",
+            "ぴかぴか はみがき、かっこいい！",
+            "あとちょっと、がんばろう！",
+            "じょうず じょうず、そのちょうし！"
+          ]
+        },
+        bath: {
+          icon: "🛁",
+          start: "おふろの じゅんび、スタート！",
+          finish: "おしまい！さっぱり きもちいいね！",
+          lines: [
+            "おふろタイム、たのしく いこう！",
+            "まずは いどうしてみよう。",
+            "いいかんじ、すすんでるよ！",
+            "あとちょっとで おふろだよ。",
+            "じゅんびできたら すごい！"
+          ]
+        },
+        goout: {
+          icon: "🎒",
+          start: "おでかけの じゅんび、はじめるよ！",
+          finish: "じゅんび できたかな？ しゅっぱつできそう！",
+          lines: [
+            "くつした、ぼうし、もったかな？",
+            "いっこずつ そろえていこう！",
+            "じゅんび じょうずに できてるよ！",
+            "あとちょっとで しゅっぱつ！",
+            "わすれもの ないか みてみよう。"
+          ]
         }
+      };
+
+      function formatTime(sec) {
+        const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const s = String(sec % 60).padStart(2, "0");
+        return `${h}:${m}:${s}`;
+      }
+
+      function getInputSeconds() {
+        const h = parseInt(hoursInput.value, 10) || 0;
+        const m = parseInt(minutesInput.value, 10) || 0;
+        const s = parseInt(secondsInput.value, 10) || 0;
+        return h * 3600 + m * 60 + s;
+      }
+
+      function updateDisplay() {
+        display.textContent = formatTime(totalSeconds);
+      }
+
+      function unlockSpeech() {
+        if (!("speechSynthesis" in window) || speechUnlocked) return;
+
+        try {
+          const u = new SpeechSynthesisUtterance("");
+          u.volume = 0;
+          window.speechSynthesis.speak(u);
+          speechUnlocked = true;
+        } catch (e) {
+          console.log("speech unlock failed", e);
+        }
+      }
+
+      function speak(text) {
+        speech.textContent = text;
+
+        if (!("speechSynthesis" in window)) return;
+        if (!speechUnlocked) return;
+        if (speakingNow) return;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "ja-JP";
+        utterance.rate = 0.95;
+        utterance.pitch = 1.2;
+        utterance.volume = 1;
+
+        utterance.onstart = () => {
+          speakingNow = true;
+        };
+
+        utterance.onend = () => {
+          speakingNow = false;
+        };
+
+        utterance.onerror = () => {
+          speakingNow = false;
+        };
+
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.log("speech error", e);
+        }
+      }
+
+      function randomLine(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      function applySceneUI() {
+        const scene = sceneData[sceneSelect.value];
+        character.textContent = scene.icon;
+        speech.textContent = "いっしょに がんばろう！";
+      }
+
+      function stopTimerOnly() {
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+        running = false;
+      }
+
+      function startTimerApp() {
+        unlockSpeech();
+        if (running) return;
 
         if (totalSeconds <= 0) {
-          stopTimerOnly();
-          totalSeconds = 0;
-          updateDisplay();
-          say("終了。やったな。");
+          totalSeconds = getInputSeconds();
+          if (totalSeconds <= 0) totalSeconds = 1;
         }
-      }, 1000);
-    }
 
-    function pauseTimerApp() {
-      stopTimerOnly();
-      say("停止");
-    }
+        running = true;
+        app.classList.remove("finished");
+        statusText.textContent = "カウントちゅう";
 
-    function resetTimerApp() {
-      stopTimerOnly();
+        const scene = sceneData[sceneSelect.value];
+        speak(scene.start);
+
+        timerId = setInterval(() => {
+          totalSeconds--;
+          updateDisplay();
+
+          if (totalSeconds > 0 && totalSeconds <= 10) {
+            speak(`${totalSeconds}...`);
+          } else if (totalSeconds > 0 && totalSeconds % 10 === 0) {
+            speak(randomLine(scene.lines));
+          }
+
+          if (totalSeconds <= 0) {
+            stopTimerOnly();
+            totalSeconds = 0;
+            updateDisplay();
+            app.classList.add("finished");
+            statusText.textContent = "おしまい";
+            speak(scene.finish);
+          }
+        }, 1000);
+      }
+
+      function pauseTimerApp() {
+        stopTimerOnly();
+        statusText.textContent = "とまってるよ";
+        speak("いったん おやすみ。");
+      }
+
+      function resetTimerApp() {
+        stopTimerOnly();
+        totalSeconds = getInputSeconds();
+        if (totalSeconds <= 0) totalSeconds = 1;
+        updateDisplay();
+        app.classList.remove("finished");
+        statusText.textContent = "たいきちゅう";
+        speak("じゅんび できたよ。");
+      }
+
+      startBtn.addEventListener("click", startTimerApp);
+      pauseBtn.addEventListener("click", pauseTimerApp);
+      resetBtn.addEventListener("click", resetTimerApp);
+
+      sceneSelect.addEventListener("change", () => {
+        applySceneUI();
+        speak("モードを かえたよ。");
+      });
+
+      [hoursInput, minutesInput, secondsInput].forEach(input => {
+        input.addEventListener("input", () => {
+          stopTimerOnly();
+          totalSeconds = getInputSeconds();
+          if (totalSeconds <= 0) totalSeconds = 1;
+          updateDisplay();
+          statusText.textContent = "たいきちゅう";
+        });
+      });
+
       totalSeconds = getInputSeconds();
       if (totalSeconds <= 0) totalSeconds = 1;
       updateDisplay();
-      say("リセット");
-    }
-
-    startBtn.addEventListener("click", startTimerApp);
-    pauseBtn.addEventListener("click", pauseTimerApp);
-    resetBtn.addEventListener("click", resetTimerApp);
-
-    totalSeconds = getInputSeconds();
-    if (totalSeconds <= 0) totalSeconds = 1;
-    updateDisplay();
-  });
-</script>
+      applySceneUI();
+    });
+  </script>
 </body>
 </html>
