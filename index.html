@@ -271,68 +271,128 @@
       let timerId = null;
       let totalSeconds = 60;
       let running = false;
-      let speechUnlocked = false;
-      let speakingNow = false;
+      let startSeconds = 60;
+      let currentAudio = null;
 
       const sceneData = {
         cleanup: {
           icon: "🧸",
-          start: "おかたづけ、スタートだよ。いっしょにやってみよう！",
-          finish: "おしまい！おかたづけできたかな？ すごいね！",
-          lines: [
+          startText: "おかたづけ、スタートだよ。いっしょにやってみよう！",
+          finishText: "おしまい！おかたづけできたかな？ すごいね！",
+          linesText: [
             "おもちゃさんを おうちに かえしてあげよう。",
             "ひとつずつで だいじょうぶだよ。",
             "あとすこし、がんばれー！",
             "できてるできてる、いいかんじ！",
             "まずは ちかくの ひとつから しまってみよう。"
+          ],
+          startSound: "sounds/start.m4a",
+          finishSound: "sounds/last.m4a",
+          lineSounds: [
+            "sounds/cheer1.m4a",
+            "sounds/cheer2.m4a",
+            "sounds/cheer3.m4a",
+            "sounds/cheer4.m4a",
+            "sounds/cheer5.m4a",
+            "sounds/cheer6.m4a",
+            "sounds/cheer7.m4a",
+            "sounds/cheer8.m4a"
           ]
         },
         sleep: {
           icon: "🌙",
-          start: "ねるまえの じゅんび、はじめるよ。ゆっくりで だいじょうぶ。",
-          finish: "じゅんび おしまい。おやすみの じかんだね。",
-          lines: [
+          startText: "ねるまえの じゅんび、はじめるよ。ゆっくりで だいじょうぶ。",
+          finishText: "じゅんび おしまい。おやすみの じかんだね。",
+          linesText: [
             "ねるじゅんび、じょうずに できてるよ。",
             "おへやを しずかモードに しよう。",
             "おやすみに むかって すすんでるよ。",
             "あとちょっとで きらきら ねるじかん。",
             "ゆっくり、ひとつずつ やってみよう。"
+          ],
+          startSound: "sounds/start.m4a",
+          finishSound: "sounds/last.m4a",
+          lineSounds: [
+            "sounds/cheer1.m4a",
+            "sounds/cheer2.m4a",
+            "sounds/cheer3.m4a",
+            "sounds/cheer4.m4a",
+            "sounds/cheer5.m4a",
+            "sounds/cheer6.m4a",
+            "sounds/cheer7.m4a",
+            "sounds/cheer8.m4a"
           ]
         },
         teeth: {
           icon: "🪥",
-          start: "はみがきタイム、スタート！ ぴかぴかに しよう！",
-          finish: "おしまい！おくち ぴかぴかだね！",
-          lines: [
+          startText: "はみがきタイム、スタート！ ぴかぴかに しよう！",
+          finishText: "おしまい！おくち ぴかぴかだね！",
+          linesText: [
             "しゃかしゃか、いいかんじ！",
             "まえの はも、おくの はも、みがいてみよう。",
             "ぴかぴか はみがき、かっこいい！",
             "あとちょっと、がんばろう！",
             "じょうず じょうず、そのちょうし！"
+          ],
+          startSound: "sounds/start.m4a",
+          finishSound: "sounds/last.m4a",
+          lineSounds: [
+            "sounds/cheer1.m4a",
+            "sounds/cheer2.m4a",
+            "sounds/cheer3.m4a",
+            "sounds/cheer4.m4a",
+            "sounds/cheer5.m4a",
+            "sounds/cheer6.m4a",
+            "sounds/cheer7.m4a",
+            "sounds/cheer8.m4a"
           ]
         },
         bath: {
           icon: "🛁",
-          start: "おふろの じゅんび、スタート！",
-          finish: "おしまい！さっぱり きもちいいね！",
-          lines: [
+          startText: "おふろの じゅんび、スタート！",
+          finishText: "おしまい！さっぱり きもちいいね！",
+          linesText: [
             "おふろタイム、たのしく いこう！",
             "まずは いどうしてみよう。",
             "いいかんじ、すすんでるよ！",
             "あとちょっとで おふろだよ。",
             "じゅんびできたら すごい！"
+          ],
+          startSound: "sounds/start.m4a",
+          finishSound: "sounds/last.m4a",
+          lineSounds: [
+            "sounds/cheer1.m4a",
+            "sounds/cheer2.m4a",
+            "sounds/cheer3.m4a",
+            "sounds/cheer4.m4a",
+            "sounds/cheer5.m4a",
+            "sounds/cheer6.m4a",
+            "sounds/cheer7.m4a",
+            "sounds/cheer8.m4a"
           ]
         },
         goout: {
           icon: "🎒",
-          start: "おでかけの じゅんび、はじめるよ！",
-          finish: "じゅんび できたかな？ しゅっぱつできそう！",
-          lines: [
+          startText: "おでかけの じゅんび、はじめるよ！",
+          finishText: "じゅんび できたかな？ しゅっぱつできそう！",
+          linesText: [
             "くつした、ぼうし、もったかな？",
             "いっこずつ そろえていこう！",
             "じゅんび じょうずに できてるよ！",
             "あとちょっとで しゅっぱつ！",
             "わすれもの ないか みてみよう。"
+          ],
+          startSound: "sounds/start.m4a",
+          finishSound: "sounds/last.m4a",
+          lineSounds: [
+            "sounds/cheer1.m4a",
+            "sounds/cheer2.m4a",
+            "sounds/cheer3.m4a",
+            "sounds/cheer4.m4a",
+            "sounds/cheer5.m4a",
+            "sounds/cheer6.m4a",
+            "sounds/cheer7.m4a",
+            "sounds/cheer8.m4a"
           ]
         }
       };
@@ -355,53 +415,27 @@
         display.textContent = formatTime(totalSeconds);
       }
 
-      function unlockSpeech() {
-        if (!("speechSynthesis" in window) || speechUnlocked) return;
-
-        try {
-          const u = new SpeechSynthesisUtterance("");
-          u.volume = 0;
-          window.speechSynthesis.speak(u);
-          speechUnlocked = true;
-        } catch (e) {
-          console.log("speech unlock failed", e);
+      function stopCurrentAudio() {
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+          currentAudio = null;
         }
       }
 
-      function speak(text) {
-        speech.textContent = text;
+      function playSound(path) {
+        if (!path) return;
 
-        if (!("speechSynthesis" in window)) return;
-        if (!speechUnlocked) return;
-        if (speakingNow) return;
+        stopCurrentAudio();
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "ja-JP";
-        utterance.rate = 0.95;
-        utterance.pitch = 1.2;
-        utterance.volume = 1;
-
-        utterance.onstart = () => {
-          speakingNow = true;
-        };
-
-        utterance.onend = () => {
-          speakingNow = false;
-        };
-
-        utterance.onerror = () => {
-          speakingNow = false;
-        };
-
-        try {
-          window.speechSynthesis.speak(utterance);
-        } catch (e) {
-          console.log("speech error", e);
-        }
+        currentAudio = new Audio(path);
+        currentAudio.play().catch((error) => {
+          console.log("audio play error:", error);
+        });
       }
 
-      function randomLine(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
+      function randomIndex(length) {
+        return Math.floor(Math.random() * length);
       }
 
       function applySceneUI() {
@@ -419,7 +453,6 @@
       }
 
       function startTimerApp() {
-        unlockSpeech();
         if (running) return;
 
         if (totalSeconds <= 0) {
@@ -427,21 +460,29 @@
           if (totalSeconds <= 0) totalSeconds = 1;
         }
 
+        startSeconds = totalSeconds;
         running = true;
         app.classList.remove("finished");
         statusText.textContent = "カウントちゅう";
 
         const scene = sceneData[sceneSelect.value];
-        speak(scene.start);
+        speech.textContent = scene.startText;
+        playSound(scene.startSound);
 
         timerId = setInterval(() => {
           totalSeconds--;
           updateDisplay();
 
           if (totalSeconds > 0 && totalSeconds <= 10) {
-            speak(`${totalSeconds}...`);
-          } else if (totalSeconds > 0 && totalSeconds % 10 === 0) {
-            speak(randomLine(scene.lines));
+            speech.textContent = `${totalSeconds}...`;
+          } else if (
+            totalSeconds > 0 &&
+            totalSeconds % 20 === 0 &&
+            totalSeconds !== startSeconds
+          ) {
+            const index = randomIndex(scene.lineSounds.length);
+            speech.textContent = scene.linesText[index % scene.linesText.length];
+            playSound(scene.lineSounds[index]);
           }
 
           if (totalSeconds <= 0) {
@@ -450,25 +491,28 @@
             updateDisplay();
             app.classList.add("finished");
             statusText.textContent = "おしまい";
-            speak(scene.finish);
+            speech.textContent = scene.finishText;
+            playSound(scene.finishSound);
           }
         }, 1000);
       }
 
       function pauseTimerApp() {
         stopTimerOnly();
+        stopCurrentAudio();
         statusText.textContent = "とまってるよ";
-        speak("いったん おやすみ。");
+        speech.textContent = "いったん おやすみ。";
       }
 
       function resetTimerApp() {
         stopTimerOnly();
+        stopCurrentAudio();
         totalSeconds = getInputSeconds();
         if (totalSeconds <= 0) totalSeconds = 1;
         updateDisplay();
         app.classList.remove("finished");
         statusText.textContent = "たいきちゅう";
-        speak("じゅんび できたよ。");
+        speech.textContent = "じゅんび できたよ。";
       }
 
       startBtn.addEventListener("click", startTimerApp);
@@ -477,12 +521,13 @@
 
       sceneSelect.addEventListener("change", () => {
         applySceneUI();
-        speak("モードを かえたよ。");
+        stopCurrentAudio();
       });
 
-      [hoursInput, minutesInput, secondsInput].forEach(input => {
+      [hoursInput, minutesInput, secondsInput].forEach((input) => {
         input.addEventListener("input", () => {
           stopTimerOnly();
+          stopCurrentAudio();
           totalSeconds = getInputSeconds();
           if (totalSeconds <= 0) totalSeconds = 1;
           updateDisplay();
