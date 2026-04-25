@@ -9,6 +9,13 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --primary: #6d5dfc;
+      --accent: #ff7aa2;
+      --text-main: #5b4b4b;
+      --surface: #ffffff;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -24,53 +31,91 @@
     .app {
       width: 340px;
       max-width: 100%;
-      background: #ffffff;
+      background: var(--surface);
       border-radius: 28px;
       padding: 20px;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
       text-align: center;
       border: 4px solid #ffe08a;
+      display: grid;
+      gap: 12px;
     }
 
     .title {
       font-size: 24px;
       font-weight: 800;
-      color: #ff7aa2;
-      margin-bottom: 8px;
+      color: var(--accent);
+      margin-bottom: 2px;
     }
 
     .subtitle {
       font-size: 13px;
       color: #8d7f7f;
-      margin-bottom: 14px;
+      margin-bottom: 4px;
+    }
+
+    .header {
+      display: grid;
+      gap: 4px;
     }
 
     .character {
       font-size: 54px;
-      margin-bottom: 8px;
+      margin-bottom: 2px;
     }
 
     .display-wrap {
       background: #fff8fb;
       border: 3px dashed #ffc6da;
       border-radius: 22px;
-      padding: 14px 10px;
-      margin-bottom: 14px;
+      padding: 14px 10px 10px;
     }
 
     .display {
       font-size: 40px;
       font-weight: 800;
       letter-spacing: 0.04em;
-      color: #6d5dfc;
+      color: var(--primary);
       font-variant-numeric: tabular-nums;
+      margin-bottom: 8px;
+    }
+
+    .progress-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #ebe8ff;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #6d5dfc 0%, #9a88ff 100%);
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #7768ff;
+      min-width: 36px;
+      text-align: right;
     }
 
     .inputs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-bottom: 14px;
     }
 
     .input-group {
@@ -100,8 +145,28 @@
       border: 2px solid #dfe3ff;
     }
 
+    .input-group input:focus {
+      border-color: #b8b0ff;
+      box-shadow: 0 0 0 3px rgba(109, 93, 252, 0.16);
+    }
+
+    .preset-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .preset-btn {
+      background: #fff5ec;
+      color: #84512d;
+      border: 2px solid #ffe0c2;
+      border-radius: 14px;
+      padding: 9px 4px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
     .mode-box {
-      margin-bottom: 14px;
       text-align: left;
     }
 
@@ -130,7 +195,6 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-bottom: 14px;
     }
 
     button {
@@ -140,11 +204,22 @@
       font-size: 15px;
       font-weight: 800;
       cursor: pointer;
-      transition: transform 0.1s ease;
+      transition: transform 0.1s ease, filter 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      filter: brightness(1.03);
     }
 
     button:active {
       transform: scale(0.97);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      filter: grayscale(0.12);
+      transform: none;
     }
 
     .start-btn {
@@ -189,7 +264,6 @@
     }
 
     .status {
-      margin-top: 10px;
       font-size: 12px;
       color: #9b8d8d;
       min-height: 18px;
@@ -208,11 +282,19 @@
 <body>
   <div class="app" id="app">
     <div class="character" id="character">🐻</div>
-    <div class="title">こどもカウントダウン</div>
-    <div class="subtitle">おしたく・おかたづけ・はみがきに</div>
+    <div class="header">
+      <div class="title">こどもカウントダウン</div>
+      <div class="subtitle">おしたく・おかたづけ・はみがきに</div>
+    </div>
 
     <div class="display-wrap">
       <div class="display" id="display">00:01:00</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">100%</div>
+      </div>
     </div>
 
     <div class="inputs">
@@ -228,6 +310,12 @@
         <label for="seconds">びょう</label>
         <input id="seconds" type="number" min="0" max="59" value="0" />
       </div>
+    </div>
+
+    <div class="preset-box">
+      <button class="preset-btn" type="button" data-seconds="60">1ぷん</button>
+      <button class="preset-btn" type="button" data-seconds="180">3ぷん</button>
+      <button class="preset-btn" type="button" data-seconds="300">5ぷん</button>
     </div>
 
     <div class="mode-box">
@@ -258,6 +346,9 @@
       const speech = document.getElementById("speech");
       const statusText = document.getElementById("status");
       const character = document.getElementById("character");
+      const progressFill = document.getElementById("progressFill");
+      const progressText = document.getElementById("progressText");
+      const presetButtons = Array.from(document.querySelectorAll(".preset-btn"));
 
       const hoursInput = document.getElementById("hours");
       const minutesInput = document.getElementById("minutes");
@@ -415,6 +506,19 @@
         display.textContent = formatTime(totalSeconds);
       }
 
+      function renderProgress() {
+        const safeStart = Math.max(startSeconds, 1);
+        const ratio = Math.min(Math.max(totalSeconds / safeStart, 0), 1);
+        const percent = Math.round(ratio * 100);
+        progressFill.style.width = `${percent}%`;
+        progressText.textContent = `${percent}%`;
+      }
+
+      function updateButtonState() {
+        startBtn.disabled = running;
+        pauseBtn.disabled = !running;
+      }
+
       function stopCurrentAudio() {
         if (currentAudio) {
           currentAudio.pause();
@@ -450,6 +554,7 @@
           timerId = null;
         }
         running = false;
+        updateButtonState();
       }
 
       function startTimerApp() {
@@ -462,6 +567,7 @@
 
         startSeconds = totalSeconds;
         running = true;
+        updateButtonState();
         app.classList.remove("finished");
         statusText.textContent = "カウントちゅう";
 
@@ -472,6 +578,7 @@
         timerId = setInterval(() => {
           totalSeconds--;
           updateDisplay();
+          renderProgress();
 
           if (totalSeconds > 0 && totalSeconds <= 10) {
             speech.textContent = `${totalSeconds}...`;
@@ -489,6 +596,7 @@
             stopTimerOnly();
             totalSeconds = 0;
             updateDisplay();
+            renderProgress();
             app.classList.add("finished");
             statusText.textContent = "おしまい";
             speech.textContent = scene.finishText;
@@ -509,7 +617,9 @@
         stopCurrentAudio();
         totalSeconds = getInputSeconds();
         if (totalSeconds <= 0) totalSeconds = 1;
+        startSeconds = totalSeconds;
         updateDisplay();
+        renderProgress();
         app.classList.remove("finished");
         statusText.textContent = "たいきちゅう";
         speech.textContent = "じゅんび できたよ。";
@@ -530,15 +640,45 @@
           stopCurrentAudio();
           totalSeconds = getInputSeconds();
           if (totalSeconds <= 0) totalSeconds = 1;
+          startSeconds = totalSeconds;
           updateDisplay();
+          renderProgress();
           statusText.textContent = "たいきちゅう";
+        });
+      });
+
+      presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const sec = parseInt(button.dataset.seconds, 10);
+          if (!Number.isFinite(sec) || sec <= 0) return;
+
+          stopTimerOnly();
+          stopCurrentAudio();
+
+          const h = Math.floor(sec / 3600);
+          const m = Math.floor((sec % 3600) / 60);
+          const s = sec % 60;
+          hoursInput.value = String(h);
+          minutesInput.value = String(m);
+          secondsInput.value = String(s);
+
+          totalSeconds = sec;
+          startSeconds = sec;
+          updateDisplay();
+          renderProgress();
+          statusText.textContent = "たいきちゅう";
+          speech.textContent = "じゅんび できたよ。";
+          app.classList.remove("finished");
         });
       });
 
       totalSeconds = getInputSeconds();
       if (totalSeconds <= 0) totalSeconds = 1;
+      startSeconds = totalSeconds;
       updateDisplay();
+      renderProgress();
       applySceneUI();
+      updateButtonState();
     });
   </script>
 </body>
